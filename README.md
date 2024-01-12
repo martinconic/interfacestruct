@@ -7,5 +7,5 @@ interfacestruct is a Go library for converting []interface{} to structure and vi
 Standard `go get`:
 
 ```
-$ go get github.com/mitchellh/mapstructure
+$ go get github.com/martinconic/interfacestruct
 ```
