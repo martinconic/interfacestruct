@@ -48,23 +48,31 @@ func (dt *DataGeneric[T]) ConvertToStruct(data []interface{}) (T, error) {
 
 		// Convert the interface value to the type of the struct field
 		if reflect.TypeOf(data[i]) != fieldType.Type {
-			if fieldType.Type.Kind() == reflect.Int {
-				d, _ := strconv.Atoi(data[i].(string))
-				fieldValue.Set(reflect.ValueOf(d))
-			} else if fieldType.Type == reflect.TypeOf(time.Time{}) {
-				layout := "2006-01-02T15:04:05.999999999Z07:00"
-				d, _ := time.Parse(layout, data[i].(string))
-				fieldValue.Set(reflect.ValueOf(d))
-			} else if fieldType.Type.Kind() == reflect.Bool {
-				d, _ := strconv.ParseBool(data[i].(string))
-				fieldValue.Set(reflect.ValueOf(d))
-			} else {
-				return dt.Data, fmt.Errorf("type mismatch for field %s", fieldType.Name)
+			value, err := getAssertedTypedValue(data[i], fieldType)
+			if err != nil {
+				return dt.Data, err
 			}
+			fieldValue.Set(value)
 		} else {
 			fieldValue.Set(reflect.ValueOf(data[i]))
 		}
 	}
 
 	return dt.Data, nil
+}
+
+func getAssertedTypedValue(data interface{}, fieldType reflect.StructField) (reflect.Value, error) {
+	if fieldType.Type.Kind() == reflect.Int {
+		d, _ := strconv.Atoi(data.(string))
+		return reflect.ValueOf(d), nil
+	} else if fieldType.Type == reflect.TypeOf(time.Time{}) {
+		layout := "2006-01-02T15:04:05.999999999Z07:00"
+		d, _ := time.Parse(layout, data.(string))
+		return reflect.ValueOf(d), nil
+	} else if fieldType.Type.Kind() == reflect.Bool {
+		d, _ := strconv.ParseBool(data.(string))
+		return reflect.ValueOf(d), nil
+	}
+
+	return reflect.ValueOf(nil), fmt.Errorf("type mismatch for field %s", fieldType.Name)
 }
