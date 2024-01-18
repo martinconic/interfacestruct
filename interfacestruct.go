@@ -45,7 +45,6 @@ func (dt *DataGeneric[T]) ConvertToStruct(data []interface{}) (T, error) {
 		if i >= len(data) {
 			return dt.Data, fmt.Errorf("not enough data to populate all fields")
 		}
-
 		// Convert the interface value to the type of the struct field
 		if reflect.TypeOf(data[i]) != fieldType.Type {
 			value, err := getAssertedTypedValue(data[i], fieldType)
@@ -64,6 +63,15 @@ func (dt *DataGeneric[T]) ConvertToStruct(data []interface{}) (T, error) {
 func getAssertedTypedValue(data interface{}, fieldType reflect.StructField) (reflect.Value, error) {
 	if fieldType.Type.Kind() == reflect.Int {
 		d, _ := strconv.Atoi(data.(string))
+		return reflect.ValueOf(d), nil
+	} else if fieldType.Type.Kind() == reflect.Uint64 {
+		d, _ := strconv.ParseUint(data.(string), 10, 64)
+		return reflect.ValueOf(d), nil
+	} else if fieldType.Type.Kind() == reflect.Float32 {
+		d, _ := strconv.ParseFloat(data.(string), 32)
+		return reflect.ValueOf(d), nil
+	} else if fieldType.Type.Kind() == reflect.Float64 {
+		d, _ := strconv.ParseFloat(data.(string), 64)
 		return reflect.ValueOf(d), nil
 	} else if fieldType.Type == reflect.TypeOf(time.Time{}) {
 		layout := "2006-01-02T15:04:05.999999999Z07:00"
