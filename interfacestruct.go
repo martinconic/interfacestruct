@@ -62,24 +62,29 @@ func (dt *DataGeneric[T]) ConvertToStruct(data []interface{}) (T, error) {
 
 func getAssertedTypedValue(data interface{}, fieldType reflect.StructField) (reflect.Value, error) {
 	if fieldType.Type.Kind() == reflect.Int {
-		d, _ := strconv.Atoi(data.(string))
-		return reflect.ValueOf(d), nil
-	} else if fieldType.Type.Kind() == reflect.Uint64 {
-		d, _ := strconv.ParseUint(data.(string), 10, 64)
-		return reflect.ValueOf(d), nil
-	} else if fieldType.Type.Kind() == reflect.Float32 {
-		d, _ := strconv.ParseFloat(data.(string), 32)
-		return reflect.ValueOf(d), nil
-	} else if fieldType.Type.Kind() == reflect.Float64 {
-		d, _ := strconv.ParseFloat(data.(string), 64)
-		return reflect.ValueOf(d), nil
-	} else if fieldType.Type == reflect.TypeOf(time.Time{}) {
+		d, err := strconv.Atoi(data.(string))
+		return reflect.ValueOf(d), err
+	} 
+	if fieldType.Type.Kind() == reflect.Uint64 {
+		d, err := strconv.ParseUint(data.(string), 10, 64)
+		return reflect.ValueOf(d), err
+	} 
+	if fieldType.Type.Kind() == reflect.Float32 {
+		d, err := strconv.ParseFloat(data.(string), 32)
+		return reflect.ValueOf(d), err
+	} 
+	if fieldType.Type.Kind() == reflect.Float64 {
+		d, err := strconv.ParseFloat(data.(string), 64)
+		return reflect.ValueOf(d), err
+	} 
+	if fieldType.Type == reflect.TypeOf(time.Time{}) {
 		layout := "2006-01-02T15:04:05.999999999Z07:00"
-		d, _ := time.Parse(layout, data.(string))
-		return reflect.ValueOf(d), nil
-	} else if fieldType.Type.Kind() == reflect.Bool {
-		d, _ := strconv.ParseBool(data.(string))
-		return reflect.ValueOf(d), nil
+		d, err := time.Parse(layout, data.(string))
+		return reflect.ValueOf(d), err
+	} 
+	if fieldType.Type.Kind() == reflect.Bool {
+		d, err := strconv.ParseBool(data.(string))
+		return reflect.ValueOf(d), err
 	}
 
 	return reflect.ValueOf(nil), fmt.Errorf("type mismatch for field %s", fieldType.Name)
